@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import data from "../Options/data.json";
 import { useDispatch } from "react-redux";
-import { Typography, Stepper, Step, StepLabel } from "@mui/material";
+import { Typography, Stepper, Step, StepLabel , Paper,
+  Box, Grid, TextField, Button} from "@mui/material";
 import "../../assets/style.css";
 import { useLocation } from "react-router-dom";
 import { select } from "../../redux/action";
@@ -9,10 +10,11 @@ import BasicDetails from "../Pages/BasicDetails";
 import FightSchedule from "../Pages/FightSchedule";
 import TIcketPurchase from "../Pages/TIcketPurchase";
 import GstDetails from "../Pages/GstDetails";
+import * as Yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import ContactInformation from "../Pages/ContactInformation";
-
+import { useForm } from "react-hook-form";
 const FlightBookingForm = () => {
-
   const [isEditMode, setIsEditMode] = useState("");
   const ids = new Date().getTime().toString();
   const [id, setid] = useState(ids);
@@ -20,7 +22,7 @@ const FlightBookingForm = () => {
   const [editt, setedit] = useState(false);
   const location = useLocation();
   const dispatch = useDispatch();
-  const [errors, setErrors] = useState({});
+  // const [errors, setErrors] = useState({});
   const localdata = JSON.parse(localStorage.getItem("allData"));
   const [allData, setAllData] = useState(localdata || []);
   const [activeStep, setActiveStep] = useState(0);
@@ -29,6 +31,12 @@ const FlightBookingForm = () => {
     isCountrySelected: false,
     selectedCity: "",
     isCitySelected: false,
+  });
+
+  const validationSchema = Yup.object().shape({
+    firstname: Yup.string()
+      .required("First name is required")
+      .matches(/^[^\d]+$/i, "Invalid first name"),
   });
 
   const countryList = data.states;
@@ -102,7 +110,13 @@ const FlightBookingForm = () => {
       isCitySelected: setIsCitySelected,
     });
   };
-
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+  });
   function getSteps() {
     return [
       "Basic Details",
@@ -112,318 +126,307 @@ const FlightBookingForm = () => {
       "contact Information",
     ];
   }
-  function validateBasicDetails(basicDetails, setErrors) {
-    let valid = true;
-    const newErrors = {};
+  // function validateBasicDetails(basicDetails, setErrors) {
+  //   let valid = true;
+  //   const newErrors = {};
 
-    if (!basicDetails.firstname) {
-      newErrors.firstname = "First name is required";
-      valid = false;
-    } else if (!/^[^\d]+$/i.test(basicDetails.firstname)) {
-      newErrors.firstname = "Invalid first name";
-      valid = false;
-    }
+  //   if (!basicDetails.firstname) {
+  //     newErrors.firstname = "First name is required";
+  //     valid = false;
+  //   } else if (!/^[^\d]+$/i.test(basicDetails.firstname)) {
+  //     newErrors.firstname = "Invalid first name";
+  //     valid = false;
+  //   }
 
-    if (!basicDetails.lastname) {
-      newErrors.lastname = "Last name is required";
-      valid = false;
-    } else if (!/^[^\d]+$/i.test(basicDetails.lastname)) {
-      newErrors.lastname = "Invalid last name";
-      valid = false;
-    }
+  //   if (!basicDetails.lastname) {
+  //     newErrors.lastname = "Last name is required";
+  //     valid = false;
+  //   } else if (!/^[^\d]+$/i.test(basicDetails.lastname)) {
+  //     newErrors.lastname = "Invalid last name";
+  //     valid = false;
+  //   }
 
-    if (!basicDetails.phone) {
-      newErrors.phone = "Phone number is required";
-      valid = false;
-    } else if (
-      /^(\\+\\d{1,3}( )?)?((\\(\\d{1,3}\\))|\\d{1,3})[- .]?\\d{3,4}[- .]?\\d{4}$/.test(
-        basicDetails.phone
-      )
-    ) {
-      newErrors.phone = "Invalid phone number";
-      valid = false;
-    } else if (basicDetails.phone.length !== 10) {
-      newErrors.phone = "Phone number should be 10 digits";
-      valid = false;
-    }
+  //   if (!basicDetails.phone) {
+  //     newErrors.phone = "Phone number is required";
+  //     valid = false;
+  //   } else if (
+  //     /^(\\+\\d{1,3}( )?)?((\\(\\d{1,3}\\))|\\d{1,3})[- .]?\\d{3,4}[- .]?\\d{4}$/.test(
+  //       basicDetails.phone
+  //     )
+  //   ) {
+  //     newErrors.phone = "Invalid phone number";
+  //     valid = false;
+  //   } else if (basicDetails.phone.length !== 10) {
+  //     newErrors.phone = "Phone number should be 10 digits";
+  //     valid = false;
+  //   }
 
-    if (!basicDetails.address.street) {
-      newErrors.street = "Street is required";
-      valid = false;
-    }
+  //   if (!basicDetails.address.street) {
+  //     newErrors.street = "Street is required";
+  //     valid = false;
+  //   }
 
-    if (!basicDetails.address.state) {
-      newErrors.state = "State is required";
-      valid = false;
-    }
+  //   if (!basicDetails.address.state) {
+  //     newErrors.state = "State is required";
+  //     valid = false;
+  //   }
 
-    if (basicDetails.address.city) {
-      newErrors.city = "";
-      valid = false;
-    }
+  //   if (basicDetails.address.city) {
+  //     newErrors.city = "";
+  //     valid = false;
+  //   }
 
-    if (!basicDetails.address.zipCode) {
-      newErrors.zipCode = "Zip code is required";
-      valid = false;
-      // } else if (!/^[1-9]{1}[0-9]{2}\s{0,1}[0-9]{3}$/i.test(basicDetails.address.zipCode)) {
-      //   newErrors.zipCode = "Invalid zip code";
-      //   valid = false;
-      // }
-    }
-    if (!basicDetails.gender) {
-      newErrors.gender = "Gender is required";
-      valid = false;
-    }
+  //   if (!basicDetails.address.zipCode) {
+  //     newErrors.zipCode = "Zip code is required";
+  //     valid = false;
+  //     // } else if (!/^[1-9]{1}[0-9]{2}\s{0,1}[0-9]{3}$/i.test(basicDetails.address.zipCode)) {
+  //     //   newErrors.zipCode = "Invalid zip code";
+  //     //   valid = false;
+  //     // }
+  //   }
+  //   if (!basicDetails.gender) {
+  //     newErrors.gender = "Gender is required";
+  //     valid = false;
+  //   }
 
-    if (!basicDetails.email) {
-      newErrors.email = "Email is required";
-      valid = false;
-    } else if (
-      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(basicDetails.email)
-    ) {
-      newErrors.email = "Invalid email address";
-      valid = false;
-    }
+  //   if (!basicDetails.email) {
+  //     newErrors.email = "Email is required";
+  //     valid = false;
+  //   } else if (
+  //     !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(basicDetails.email)
+  //   ) {
+  //     newErrors.email = "Invalid email address";
+  //     valid = false;
+  //   }
 
-    setErrors(newErrors);
-    return valid;
-  }
+  //   setErrors(newErrors);
+  //   return valid;
+  // }
 
-  function validateFlightSchedule() {
-    let valid = true;
-    const newErrors = {};
+  // function validateFlightSchedule() {
+  //   let valid = true;
+  //   const newErrors = {};
 
-    if (!flightSchedule.flightNo) {
-      newErrors.flightNo = "Flight number is required";
-      valid = false;
-    } else {
-      if (!/^([A-Z]{2}\d{4})$/i.test(flightSchedule.flightNo)) {
-        newErrors.flightNo = "Invalid flight number";
-        valid = false;
-      }
-    }
+  //   if (!flightSchedule.flightNo) {
+  //     newErrors.flightNo = "Flight number is required";
+  //     valid = false;
+  //   } else {
+  //     if (!/^([A-Z]{2}\d{4})$/i.test(flightSchedule.flightNo)) {
+  //       newErrors.flightNo = "Invalid flight number";
+  //       valid = false;
+  //     }
+  //   }
 
-    if (!flightSchedule.airlineName) {
-      newErrors.airlineName = "Airline name is required";
-      valid = false;
-    } else {
-      if (!/^[A-Za-z\s]+$/i.test(flightSchedule.airlineName)) {
-        newErrors.airlineName = "Invalid airline name";
-        valid = false;
-      }
-    }
+  //   if (!flightSchedule.airlineName) {
+  //     newErrors.airlineName = "Airline name is required";
+  //     valid = false;
+  //   } else {
+  //     if (!/^[A-Za-z\s]+$/i.test(flightSchedule.airlineName)) {
+  //       newErrors.airlineName = "Invalid airline name";
+  //       valid = false;
+  //     }
+  //   }
 
-    if (!flightSchedule.tripType) {
-      newErrors.tripType = "Trip type is required";
-      valid = false;
-    }
+  //   if (!flightSchedule.tripType) {
+  //     newErrors.tripType = "Trip type is required";
+  //     valid = false;
+  //   }
 
-    if (!flightSchedule.departureAirport) {
-      newErrors.departureAirport = "Departure airport is required";
-      valid = false;
-    } else {
-      if (!/^[A-Za-z\s]+$/i.test(flightSchedule.departureAirport)) {
-        newErrors.departureAirport = "Invalid departure airport";
-        valid = false;
-      }
-    }
+  //   if (!flightSchedule.departureAirport) {
+  //     newErrors.departureAirport = "Departure airport is required";
+  //     valid = false;
+  //   } else {
+  //     if (!/^[A-Za-z\s]+$/i.test(flightSchedule.departureAirport)) {
+  //       newErrors.departureAirport = "Invalid departure airport";
+  //       valid = false;
+  //     }
+  //   }
 
-    if (!flightSchedule.arrivedAirport) {
-      newErrors.arrivedAirport = "Arrival airport is required";
-      valid = false;
-    } else {
-      if (!/^[A-Za-z\s]+$/i.test(flightSchedule.arrivedAirport)) {
-        newErrors.arrivedAirport = "Invalid arrival airport";
-        valid = false;
-      }
-    }
+  //   if (!flightSchedule.arrivedAirport) {
+  //     newErrors.arrivedAirport = "Arrival airport is required";
+  //     valid = false;
+  //   } else {
+  //     if (!/^[A-Za-z\s]+$/i.test(flightSchedule.arrivedAirport)) {
+  //       newErrors.arrivedAirport = "Invalid arrival airport";
+  //       valid = false;
+  //     }
+  //   }
 
-    if (flightSchedule.departureAirport === flightSchedule.arrivedAirport) {
-      newErrors.arrivedAirport =
-        "Departure and arrival airports cannot be the same";
-      valid = false;
-    }
+  //   if (flightSchedule.departureAirport === flightSchedule.arrivedAirport) {
+  //     newErrors.arrivedAirport =
+  //       "Departure and arrival airports cannot be the same";
+  //     valid = false;
+  //   }
 
-    if (!flightSchedule.departureDate) {
-      newErrors.departureDate = "Departure date is required";
-      valid = false;
-    } else {
-      const currentDate = new Date();
-      const departureDate = new Date(flightSchedule.departureDate);
-      if (departureDate <= currentDate) {
-        newErrors.departureDate = "Invalid departure date";
-        valid = false;
-      }
-    }
+  //   if (!flightSchedule.departureDate) {
+  //     newErrors.departureDate = "Departure date is required";
+  //     valid = false;
+  //   } else {
+  //     const currentDate = new Date();
+  //     const departureDate = new Date(flightSchedule.departureDate);
+  //     if (departureDate <= currentDate) {
+  //       newErrors.departureDate = "Invalid departure date";
+  //       valid = false;
+  //     }
+  //   }
 
-    if (flightSchedule.tripType === "return") {
-      if (!flightSchedule.returnDate) {
-        newErrors.returnDate = "Return date is required";
-        valid = false;
-      } else {
-        const departureDate = new Date(flightSchedule.departureDate);
-        const returnDate = new Date(flightSchedule.returnDate);
-        if (returnDate <= departureDate) {
-          newErrors.returnDate = "Invalid return date";
-          valid = false;
-        }
-      }
-    }
+  //   if (flightSchedule.tripType === "return") {
+  //     if (!flightSchedule.returnDate) {
+  //       newErrors.returnDate = "Return date is required";
+  //       valid = false;
+  //     } else {
+  //       const departureDate = new Date(flightSchedule.departureDate);
+  //       const returnDate = new Date(flightSchedule.returnDate);
+  //       if (returnDate <= departureDate) {
+  //         newErrors.returnDate = "Invalid return date";
+  //         valid = false;
+  //       }
+  //     }
+  //   }
 
-    if (!flightSchedule.seatClass) {
-      newErrors.seatClass = "Seat class is required";
-      valid = false;
-    } else {
-      // if (!/^(Economy Class|One Way Trips|Economy Class|Business Class)$/i.test(flightSchedule.seatClass)) {
-      //   newErrors.seatClass = "Invalid seat class";
-      //   valid = false;
-      // }
-    }
+  //   if (!flightSchedule.seatClass) {
+  //     newErrors.seatClass = "Seat class is required";
+  //     valid = false;
+  //   } else {
+  //     // if (!/^(Economy Class|One Way Trips|Economy Class|Business Class)$/i.test(flightSchedule.seatClass)) {
+  //     //   newErrors.seatClass = "Invalid seat class";
+  //     //   valid = false;
+  //     // }
+  //   }
 
-    setErrors(newErrors);
-    return valid;
-  }
+  //   setErrors(newErrors);
+  //   return valid;
+  // }
 
-  function validateTicketPurchase() {
-    let valid = true;
-    const newErrors = {};
+  // function validateTicketPurchase() {
+  //   let valid = true;
+  //   const newErrors = {};
 
-    if (!ticketPurchase.fullName) {
-      newErrors.fullName = "Full name is required";
-      valid = false;
-    } else if (!/^[^\d]+$/i.test(ticketPurchase.fullName)) {
-      newErrors.fullName = "Invalid last name";
-      valid = false;
-    }
+  //   if (!ticketPurchase.fullName) {
+  //     newErrors.fullName = "Full name is required";
+  //     valid = false;
+  //   } else if (!/^[^\d]+$/i.test(ticketPurchase.fullName)) {
+  //     newErrors.fullName = "Invalid last name";
+  //     valid = false;
+  //   }
 
-    if (!ticketPurchase.cardnumber) {
-      newErrors.cardnumber = "Card number is required";
-      valid = false;
-    } else {
-      if (!/^\d{16}$/.test(ticketPurchase.cardnumber)) {
-        newErrors.cardnumber = "Invalid card number card length should be 16";
-        valid = false;
-      }
-    }
+  //   if (!ticketPurchase.cardnumber) {
+  //     newErrors.cardnumber = "Card number is required";
+  //     valid = false;
+  //   } else {
+  //     if (!/^\d{16}$/.test(ticketPurchase.cardnumber)) {
+  //       newErrors.cardnumber = "Invalid card number card length should be 16";
+  //       valid = false;
+  //     }
+  //   }
 
-    if (!ticketPurchase.paymentDateTime) {
-      newErrors.paymentDateTime = "Payment date and time are required";
-      valid = false;
-    } else {
-      const currentDateTime = new Date();
-      const paymentDateTime = new Date(ticketPurchase.paymentDateTime);
-      if (paymentDateTime <= currentDateTime) {
-        newErrors.paymentDateTime =
-          "Invalid payment date and time it must be a future data";
-        valid = false;
-      }
-    }
+  //   if (!ticketPurchase.paymentDateTime) {
+  //     newErrors.paymentDateTime = "Payment date and time are required";
+  //     valid = false;
+  //   } else {
+  //     const currentDateTime = new Date();
+  //     const paymentDateTime = new Date(ticketPurchase.paymentDateTime);
+  //     if (paymentDateTime <= currentDateTime) {
+  //       newErrors.paymentDateTime =
+  //         "Invalid payment date and time it must be a future data";
+  //       valid = false;
+  //     }
+  //   }
 
-    if (!ticketPurchase.Phone) {
-      newErrors.phone = "phone is required";
-      valid = false;
-    } else if (!/^[0-9\b]+$/i.test(ticketPurchase.Phone)) {
-      newErrors.Phone = "Invalid phone number";
-      valid = false;
-    } else if (ticketPurchase.Phone.length !== 10) {
-      newErrors.Phone = "Phone number should be 10 digits";
-      valid = false;
-    }
+  //   if (!ticketPurchase.Phone) {
+  //     newErrors.phone = "phone is required";
+  //     valid = false;
+  //   } else if (!/^[0-9\b]+$/i.test(ticketPurchase.Phone)) {
+  //     newErrors.Phone = "Invalid phone number";
+  //     valid = false;
+  //   } else if (ticketPurchase.Phone.length !== 10) {
+  //     newErrors.Phone = "Phone number should be 10 digits";
+  //     valid = false;
+  //   }
 
-    if (!ticketPurchase.month) {
-      newErrors.month = "Expiry month is required";
-      valid = false;
-    } else {
-      if (!/^0[1-9]|1[0-2]$/i.test(ticketPurchase.month)) {
-        newErrors.month = "Invalid expiry month";
-        valid = false;
-      }
-    }
+  //   if (!ticketPurchase.month) {
+  //     newErrors.month = "Expiry month is required";
+  //     valid = false;
+  //   } else {
+  //     if (!/^0[1-9]|1[0-2]$/i.test(ticketPurchase.month)) {
+  //       newErrors.month = "Invalid expiry month";
+  //       valid = false;
+  //     }
+  //   }
 
-    if (!ticketPurchase.cvv) {
-      newErrors.cvv = "CVV is required";
-      valid = false;
-    } else {
-      if (!/^\d{3}$/i.test(ticketPurchase.cvv)) {
-        newErrors.cvv = "Invalid CVV";
-        valid = false;
-      }
-    }
+  //   if (!ticketPurchase.cvv) {
+  //     newErrors.cvv = "CVV is required";
+  //     valid = false;
+  //   } else {
+  //     if (!/^\d{3}$/i.test(ticketPurchase.cvv)) {
+  //       newErrors.cvv = "Invalid CVV";
+  //       valid = false;
+  //     }
+  //   }
 
-    setErrors(newErrors);
-    return valid;
-  }
+  //   setErrors(newErrors);
+  //   return valid;
+  // }
 
-  function validateGstDetails() {
-    let valid = true;
-    const newErrors = {};
+  // function validateGstDetails() {
+  //   let valid = true;
+  //   const newErrors = {};
 
-    if (!gstDetails.gstNumber) {
-      newErrors.gstNumber = "GST number is required";
-      valid = false;
-    }
+  //   if (!gstDetails.gstNumber) {
+  //     newErrors.gstNumber = "GST number is required";
+  //     valid = false;
+  //   }
 
-    if (!gstDetails.companyName) {
-      newErrors.companyName = "Company name is required";
-      valid = false;
-    }
-    if (!gstDetails.companyID) {
-      newErrors.companyID = "Company id required";
-      valid = false;
-    }
+  //   if (!gstDetails.companyName) {
+  //     newErrors.companyName = "Company name is required";
+  //     valid = false;
+  //   }
+  //   if (!gstDetails.companyID) {
+  //     newErrors.companyID = "Company id required";
+  //     valid = false;
+  //   }
 
-    setErrors(newErrors);
-    return valid;
-  }
+  //   setErrors(newErrors);
+  //   return valid;
+  // }
 
-  function validateContactInformation() {
-    let valid = true;
-    const newErrors = {};
+  // function validateContactInformation() {
+  //   let valid = true;
+  //   const newErrors = {};
 
-    if (!contactInformation.mobilePhone) {
-      newErrors.mobilePhone = "Mobile phone number is required";
-      valid = false;
-    }
+  //   if (!contactInformation.mobilePhone) {
+  //     newErrors.mobilePhone = "Mobile phone number is required";
+  //     valid = false;
+  //   }
 
-    if (!contactInformation.emergencyContactNumber) {
-      newErrors.emergencyContactNumber = "Emergency contact number is required";
-      valid = false;
-    }
+  //   if (!contactInformation.emergencyContactNumber) {
+  //     newErrors.emergencyContactNumber = "Emergency contact number is required";
+  //     valid = false;
+  //   }
 
-    if (!contactInformation.emergencyContactName) {
-      newErrors.emergencyContactName = "Emergency contact name is required";
-      valid = false;
-    }
-    setErrors(newErrors);
-    return valid;
-  }
+  //   if (!contactInformation.emergencyContactName) {
+  //     newErrors.emergencyContactName = "Emergency contact name is required";
+  //     valid = false;
+  //   }
+  //   setErrors(newErrors);
+  //   return valid;
+  // }
 
   const steps = getSteps();
 
   function getStepContent(step) {
     switch (step) {
       case 0:
-        return (
-          <BasicDetails
-            allData={allData}
-            setBasicDetails={setBasicDetails}
-            basicDetails={basicDetails}
-            errors={errors}
-            setErrors={setErrors}
-            onChange={handleInputChange}
-            onCountryChange={onCountryChange}
-            onCityChange={onCityChange}
-            states={states}
-            cities={cities}
-          />
-        );
+  return (
+      <BasicDetails/>
+  );
       case 1:
         return (
           <FightSchedule
             setFlightSchedule={setFlightSchedule}
             flightSchedule={flightSchedule}
             errors={errors}
-            setErrors={setErrors}
+            // setErrors={setErrors}
             onCountryChange={onCountryChange}
             onCityChange={onCityChange}
           />
@@ -433,7 +436,7 @@ const FlightBookingForm = () => {
           <TIcketPurchase
             setTicketPurchase={setTicketPurchase}
             ticketPurchase={ticketPurchase}
-            setErrors={setErrors}
+            // setErrors={setErrors}
             errors={errors}
           />
         );
@@ -443,7 +446,7 @@ const FlightBookingForm = () => {
             setGstDetails={setGstDetails}
             gstDetails={gstDetails}
             errors={errors}
-            setErrors={setErrors}
+            // setErrors={setErrors}
             onCountryChange={onCountryChange}
             onCityChange={onCityChange}
             states={states}
@@ -456,7 +459,7 @@ const FlightBookingForm = () => {
             setContactInformation={setContactInformation}
             contactInformation={contactInformation}
             errors={errors}
-            setErrors={setErrors}
+            // setErrors={setErrors}
             onCountryChange={onCountryChange}
             onCityChange={onCityChange}
             states={states}
@@ -470,34 +473,34 @@ const FlightBookingForm = () => {
   }
   const handleNext = () => {
     if (activeStep === 0) {
-      const isValid = validateBasicDetails(basicDetails, setErrors);
-      if (!isValid) {
-        return;
-      }
+      // const isValid = validateBasicDetails(basicDetails, setErrors);
+      // if (!isValid) {
+      //   return;
+      // }
     }
     if (activeStep === 1) {
-      const isValid = validateFlightSchedule();
-      if (!isValid) {
-        return;
-      }
+      // const isValid = validateFlightSchedule();
+      // if (!isValid) {
+      //   return;
+      // }
     }
     if (activeStep === 2) {
-      const isValid = validateTicketPurchase();
-      if (!isValid) {
-        return;
-      }
+      // const isValid = validateTicketPurchase();
+      // if (!isValid) {
+      //   return;
+      // }
     }
     if (activeStep === 3) {
-      const isValid = validateGstDetails();
-      if (!isValid) {
-        return;
-      }
+      // const isValid = validateGstDetails();
+      // if (!isValid) {
+      //   return;
+      // }
     }
     if (activeStep === 4) {
-      const isValid = validateContactInformation();
-      if (!isValid) {
-        return;
-      }
+      // const isValid = validateContactInformation();
+      // if (!isValid) {
+      //   return;
+      // }
     }
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
@@ -516,7 +519,9 @@ const FlightBookingForm = () => {
       const queryParams = new URLSearchParams(location.search);
       const idedit = queryParams.get("id");
       setIsEditMode(idedit);
-      if (idedit) { setedit(true); }
+      if (idedit) {
+        setedit(true);
+      }
       const editdata = [];
       if (idedit) {
         setEditData(newData);
@@ -531,46 +536,46 @@ const FlightBookingForm = () => {
         const updatedData = [...allData, newData];
         dispatch(select(updatedData));
         localStorage.setItem("allData", JSON.stringify(updatedData));
-      } 
+      }
     }
   };
 
-  const handleSubmit = (event) => {
-    const newData = {
-      basicDetails: basicDetails,
-      flightSchedule: flightSchedule,
-      ticketPurchase: ticketPurchase,
-      gstDetails: gstDetails,
-      contactInformation: contactInformation,
-      id: id,
-    };
-    //   const updatedData = [...allData, newData];
-    //   setAllData(updatedData);
-    //   localStorage.setItem("allData", JSON.stringify(updatedData));
+  // const handleSubmit = (event) => {
+  //   const newData = {
+  //     basicDetails: basicDetails,
+  //     flightSchedule: flightSchedule,
+  //     ticketPurchase: ticketPurchase,
+  //     gstDetails: gstDetails,
+  //     contactInformation: contactInformation,
+  //     id: id,
+  //   };
+  //   //   const updatedData = [...allData, newData];
+  //   //   setAllData(updatedData);
+  //   //   localStorage.setItem("allData", JSON.stringify(updatedData));
 
-    //   setBasicDetails({});
-    //   setFlightSchedule({});
-    //   setTicketPurchase({});
-    //   setGstDetails({});
-    //   setContactInformation({});
-    // };
+  //   //   setBasicDetails({});
+  //   //   setFlightSchedule({});
+  //   //   setTicketPurchase({});
+  //   //   setGstDetails({});
+  //   //   setContactInformation({});
+  //   // };
 
-    // let updatedData;
-    // if (isEditMode) {
-    //   updatedData = allData.map((item) => (item.id === id ? newData : item));
-    // } else {
-    //   updatedData = [...allData, newData];
-    // }
+  //   // let updatedData;
+  //   // if (isEditMode) {
+  //   //   updatedData = allData.map((item) => (item.id === id ? newData : item));
+  //   // } else {
+  //   //   updatedData = [...allData, newData];
+  //   // }
 
-    // setAllData(updatedData);
-    // localStorage.setItem("allData", JSON.stringify(updatedData));
+  //   // setAllData(updatedData);
+  //   // localStorage.setItem("allData", JSON.stringify(updatedData));
 
-    setBasicDetails({});
-    setFlightSchedule({});
-    setTicketPurchase({});
-    setGstDetails({});
-    setContactInformation({});
-  };
+  //   setBasicDetails({});
+  //   setFlightSchedule({});
+  //   setTicketPurchase({});
+  //   setGstDetails({});
+  //   setContactInformation({});
+  // };
   const handleBack = () => {
     setActiveStep(activeStep - 1);
   };
@@ -653,7 +658,10 @@ const FlightBookingForm = () => {
       currentZipcode: "",
     },
   });
-
+    const onSubmit = (data) => {
+      console.log(data);
+      // Perform other actions with the form data
+    };
   useEffect(() => {
     const storedData = localStorage.getItem("allData");
     if (storedData) {
@@ -661,61 +669,119 @@ const FlightBookingForm = () => {
     }
   }, []);
 
+//   return (
+//     <div>
+//       <Stepper activeStep={activeStep}>
+//         {steps.map((step, index) => {
+//           return (
+//             <Step key={index}>
+//               <StepLabel>{step}</StepLabel>
+//             </Step>
+//           );
+//         })}
+//       </Stepper>
+//       <br></br>
+//       <form onSubmit={handleSubmit(onSubmit)}>
+//         {getStepContent(activeStep)}
+//       </form>
+//       {activeStep === 5 ? (
+//         <Typography variant="h3" align="center">
+//           Form submitted Successfully
+//         </Typography>
+//       ) : (
+//         <>
+//           <button
+//             className="btn"
+//             type="button"
+//             disabled={activeStep === 0}
+//             onClick={handleBack}>
+//             Back
+//           </button>
+//         </>
+//       )}
+//       {activeStep === 0 ||
+//       activeStep === 1 ||
+//       activeStep === 2 ||
+//       activeStep === 3 ? (
+//         <>
+//           <button className="btn" onClick={handleNext}>
+//             Next
+//           </button>
+//         </>
+//       ) : (
+//         <>
+//           {errors ? (
+//             <div>
+//               {/* <button onClick={handleSubmit} disabled>next</button> */}
+//               <button className="btn" onClick={handlesave}>
+//                 Finish
+//               </button>
+//               {/* <button onClick={handleSubmit}></button> */}
+//             </div>
+//           ) : (
+//             <button className="btn" >
+//               Finish
+//             </button>
+//           )}
+//         </>
+//       )}
+//     </div>
+//   );
+// };
+// export default FlightBookingForm;
+
+// // jsx
+// import React, { Fragment } from "react";
+// import { useForm } from "react-hook-form";
+// import { yupResolver } from "@hookform/resolvers/yup";
+// import * as Yup from "yup";
+// import {
+//   Paper,
+//   Box,
+//   Grid,
+//   TextField,
+//   Typography,
+//   Button,
+// } from "@material-ui/core";
+
+// const FlightBookingForm = () => {
+//   const validationSchema = Yup.object().shape({
+//     firstname: Yup.string()
+//       .required("First name is required")
+//       .matches(/^[^\d]+$/i, "Invalid first name"),
+//   });
+
+//   const {
+//     register,
+//     handleSubmit,
+//     formState: { errors },
+//   } = useForm({
+//     resolver: yupResolver(validationSchema),
+//   });
+
+//   const onSubmit = (data) => {
+//     console.log(data);
+//     // Perform other actions with the form data
+//   };
+
   return (
-    <div>
-      <Stepper activeStep={activeStep}>
-        {steps.map((step, index) => {
-          return (
-            <Step key={index}>
-              <StepLabel>{step}</StepLabel>
-            </Step>
-          );
-        })}
-      </Stepper>
-      <br></br>
-      <form>{getStepContent(activeStep)}</form>
-      {activeStep === 5 ? (
-        <Typography variant="h3" align="center">
-          Form submitted Successfully
-        </Typography>
-      ) : (
-        <>
-          <button
-            className="btn"
-            type="button"
-            disabled={activeStep === 0}
-            onClick={handleBack}>
-            Back
-          </button>
-        </>
-      )}
-      {activeStep === 0 ||
-      activeStep === 1 ||
-      activeStep === 2 ||
-      activeStep === 3 ? (
-        <>
-          <button className="btn" onClick={handleNext}>
-            Next
-          </button>
-        </>
-      ) : (
-        <>
-          {errors ? (
-            <div>
-              {/* <button onClick={handleSubmit} disabled>next</button> */}
-              <button className="btn" onClick={handlesave}>
-                Finish
-              </button>
-              {/* <button onClick={handleSubmit}></button> */}
-            </div>
-          ) : (
-            <button className="btn" onClick={handleSubmit}>
-              Finish
-            </button>
-          )}
-        </>
-      )}
-    </div>
+
+      <Paper>
+        <Box px={3} py={2}>
+          <Typography variant="h6" align="center" margin="dense">
+            Basic Details
+          </Typography>
+          <form onSubmit={handleSubmit(onSubmit)}>
+         <BasicDetails/>
+            <Box mt={3}>
+              <Button type="submit" variant="contained" color="primary">
+                Next
+              </Button>
+            </Box>
+          </form>
+        </Box>
+      </Paper>
+
   );
 };
 export default FlightBookingForm;
